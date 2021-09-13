@@ -17,6 +17,7 @@
 		4F5C3DD326EC50F300CB2742 /* CapturePipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F5C3DD226EC50F300CB2742 /* CapturePipeline.swift */; };
 		4F5C3DD526EC510500CB2742 /* Recorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F5C3DD426EC510500CB2742 /* Recorder.swift */; };
 		4F5C3DD726EC53B200CB2742 /* ObjC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F5C3DD626EC53B200CB2742 /* ObjC.swift */; };
+		4FAC581F26EF4A14005AB01A /* RenderState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FAC581E26EF4A14005AB01A /* RenderState.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +35,7 @@
 		4F5C3DD226EC50F300CB2742 /* CapturePipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturePipeline.swift; sourceTree = "<group>"; };
 		4F5C3DD426EC510500CB2742 /* Recorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recorder.swift; sourceTree = "<group>"; };
 		4F5C3DD626EC53B200CB2742 /* ObjC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjC.swift; sourceTree = "<group>"; };
+		4FAC581E26EF4A14005AB01A /* RenderState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderState.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,6 +73,7 @@
 				4F5C3DBE26EBDAA200CB2742 /* ShaderTypes.h */,
 				4F5C3DC126EBDAA200CB2742 /* ViewController.swift */,
 				4F5C3DBF26EBDAA200CB2742 /* Renderer.swift */,
+				4FAC581E26EF4A14005AB01A /* RenderState.swift */,
 				4F5C3DD226EC50F300CB2742 /* CapturePipeline.swift */,
 				4F5C3DD426EC510500CB2742 /* Recorder.swift */,
 				4F5C3DD626EC53B200CB2742 /* ObjC.swift */,
@@ -158,6 +161,7 @@
 				4F5C3DD326EC50F300CB2742 /* CapturePipeline.swift in Sources */,
 				4F5C3DD726EC53B200CB2742 /* ObjC.swift in Sources */,
 				4F5C3DD526EC510500CB2742 /* Recorder.swift in Sources */,
+				4FAC581F26EF4A14005AB01A /* RenderState.swift in Sources */,
 				4F5C3DC226EBDAA200CB2742 /* ViewController.swift in Sources */,
 				4F5C3DBB26EBDAA200CB2742 /* AppDelegate.swift in Sources */,
 			);

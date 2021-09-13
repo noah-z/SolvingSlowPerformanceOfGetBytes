@@ -209,27 +209,12 @@ class Recorder: NSObject {
                     }
                 }
                 
-                guard let pixelBufferPool = self._videoPixelBufferAdaptor?.pixelBufferPool else {
-                    print("Pixel buffer asset writer input did not have a pixel buffer pool available; cannot retrieve frame")
-                    return
-                }
                 var maybePixelBuffer: CVPixelBuffer? = nil
-                let status  = CVPixelBufferPoolCreatePixelBuffer(nil, pixelBufferPool, &maybePixelBuffer)
-                if status != kCVReturnSuccess {
-                    print("Could not get pixel buffer from asset writer input; dropping frame...")
-                    return
-                }
-                guard let pixelBuffer = maybePixelBuffer else { return }
-                CVPixelBufferLockBaseAddress(pixelBuffer, [])
-                let pixelBufferBytes = CVPixelBufferGetBaseAddress(pixelBuffer)!
-                // Use the bytes per row value from the pixel buffer since its stride may be rounded up to be 16-byte aligned
-                let bytesPerRow = CVPixelBufferGetBytesPerRow(pixelBuffer)
-                let region = MTLRegionMake2D(0, 0, videoTexture!.width, videoTexture!.height)
-                videoTexture!.getBytes(pixelBufferBytes, bytesPerRow: bytesPerRow, from: region, mipmapLevel: 0)
+                let data = RenderState.shared.blitBuffer.contents()
+                CVPixelBufferCreateWithBytes(nil, videoTexture!.width, videoTexture!.height, kCVPixelFormatType_32BGRA, data, 4 * videoTexture!.width, nil, nil, nil, &maybePixelBuffer)
                 let frameTime = CACurrentMediaTime() - self._startTimeForVideo
                 let presentationTime = CMTimeMakeWithSeconds(frameTime, preferredTimescale: 600)
-                self._videoPixelBufferAdaptor?.append(pixelBuffer, withPresentationTime: presentationTime)
-                CVPixelBufferUnlockBaseAddress(pixelBuffer, [])
+                self._videoPixelBufferAdaptor?.append(maybePixelBuffer!, withPresentationTime: presentationTime)
                 
             }
         }

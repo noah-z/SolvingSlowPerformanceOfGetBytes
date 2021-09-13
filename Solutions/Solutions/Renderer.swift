@@ -54,7 +54,7 @@ class Renderer {
     var capturePipline: CapturePipeline
     
     // The current viewport size
-    var viewportSize: CGSize = CGSize()
+    var viewportSize: CGSize
     
     // Flag for viewport size changes
     var viewportSizeDidChange: Bool = false
@@ -64,10 +64,11 @@ class Renderer {
     var startTime = Date()
     
     
-    init(capturePipline:CapturePipeline, metalDevice device: MTLDevice, renderDestination: RenderDestinationProvider) {
+    init(capturePipline:CapturePipeline, metalDevice device: MTLDevice, renderDestination: RenderDestinationProvider, viewportSize: CGSize) {
         self.capturePipline = capturePipline
         self.device = device
         self.renderDestination = renderDestination
+        self.viewportSize = viewportSize
         loadMetal()
     }
     
@@ -98,6 +99,17 @@ class Renderer {
                 renderEncoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: 4)
                 renderEncoder.popDebugGroup()
                 renderEncoder.endEncoding()
+                
+                //Solution
+                let blitEncoder = commandBuffer.makeBlitCommandEncoder()
+                blitEncoder?.label = "blit"
+                let width = currentDrawable.texture.width
+                let height = currentDrawable.texture.height
+                let origin = MTLOriginMake(0, 0, 0)
+                let size = MTLSizeMake(width, height, 1)
+                blitEncoder?.copy(from: currentDrawable.texture, sourceSlice: 0, sourceLevel: 0, sourceOrigin: origin, sourceSize: size, to: RenderState.shared.blitBuffer, destinationOffset: 0, destinationBytesPerRow: 4 * width, destinationBytesPerImage: 4 * width * height)
+                blitEncoder?.endEncoding()
+                
                 commandBuffer.present(currentDrawable)
             }
             
@@ -113,6 +125,9 @@ class Renderer {
         renderDestination.depthStencilPixelFormat = .depth32Float
         renderDestination.colorPixelFormat = .bgra8Unorm
         renderDestination.sampleCount = 1
+        
+        RenderState.shared.blitBuffer = device.makeBuffer(length: Int(viewportSize.width) * Int(viewportSize.height) * 4, options: .storageModeShared)
+        RenderState.shared.blitBuffer.label = "blitBuffer"
         
         let sharedUniformBufferSize = kAlignedSharedUniformsSize * kMaxBuffersInFlight
         sharedUniformBuffer = device.makeBuffer(length: sharedUniformBufferSize, options: .storageModeShared)
