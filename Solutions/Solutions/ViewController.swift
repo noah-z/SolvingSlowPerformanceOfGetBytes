@@ -44,7 +44,7 @@ class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate, Capt
             capturePipeline = CapturePipeline(frameSize: screenSize, delegate: self, callbackQueue: DispatchQueue.main)
             
             // Configure the renderer to draw to the view
-            renderer = Renderer(capturePipline: capturePipeline, metalDevice: view.device!, renderDestination: view)
+            renderer = Renderer(capturePipline: capturePipeline, metalDevice: view.device!, renderDestination: view, viewportSize: screenSize)
             
             renderer.drawRectResized(size: screenSize)
         }

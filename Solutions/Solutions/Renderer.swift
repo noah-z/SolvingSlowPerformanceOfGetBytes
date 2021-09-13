@@ -54,7 +54,7 @@ class Renderer {
     var capturePipline: CapturePipeline
     
     // The current viewport size
-    var viewportSize: CGSize = CGSize()
+    var viewportSize: CGSize
     
     // Flag for viewport size changes
     var viewportSizeDidChange: Bool = false
@@ -64,10 +64,11 @@ class Renderer {
     var startTime = Date()
     
     
-    init(capturePipline:CapturePipeline, metalDevice device: MTLDevice, renderDestination: RenderDestinationProvider) {
+    init(capturePipline:CapturePipeline, metalDevice device: MTLDevice, renderDestination: RenderDestinationProvider, viewportSize: CGSize) {
         self.capturePipline = capturePipline
         self.device = device
         self.renderDestination = renderDestination
+        self.viewportSize = viewportSize
         loadMetal()
     }
     
@@ -82,7 +83,10 @@ class Renderer {
         let _ = inFlightSemaphore.wait(timeout: DispatchTime.distantFuture)
         if let commandBuffer = commandQueue.makeCommandBuffer() {
             commandBuffer.label = "MyCommand"
-            let texture = renderDestination.currentDrawable?.texture
+            
+            //Solution
+            let texture = RenderState.shared.blitTexture
+
             commandBuffer.addCompletedHandler{ [weak self] commandBuffer in
                 if let strongSelf = self {
                     strongSelf.inFlightSemaphore.signal()
@@ -98,6 +102,12 @@ class Renderer {
                 renderEncoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: 4)
                 renderEncoder.popDebugGroup()
                 renderEncoder.endEncoding()
+                
+                //Solution
+                let blitEncoder = commandBuffer.makeBlitCommandEncoder()
+                blitEncoder?.copy(from: currentDrawable.texture, to: RenderState.shared.blitTexture)
+                blitEncoder?.endEncoding()
+
                 commandBuffer.present(currentDrawable)
             }
             
@@ -121,6 +131,13 @@ class Renderer {
         let imagePlaneVertexDataCount = kImagePlaneVertexData.count * MemoryLayout<Float>.size
         imagePlaneVertexBuffer = device.makeBuffer(bytes: kImagePlaneVertexData, length: imagePlaneVertexDataCount, options: [])
         imagePlaneVertexBuffer.label = "ImagePlaneVertexBuffer"
+        
+        //Solution
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: renderDestination.colorPixelFormat, width: Int(viewportSize.width), height: Int(viewportSize.height), mipmapped: false)
+        textureDescriptor.usage = MTLTextureUsage(rawValue: MTLTextureUsage.renderTarget.rawValue | MTLTextureUsage.shaderRead.rawValue)
+        textureDescriptor.allowGPUOptimizedContents = false
+        RenderState.shared.blitTexture = device.makeTexture(descriptor: textureDescriptor)!
+
         
         // Load all the shader files with a metal file extension in the project
         let defaultLibrary = device.makeDefaultLibrary()!
